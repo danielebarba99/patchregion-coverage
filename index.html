@@ -404,7 +404,7 @@
     font-family: 'Syne', sans-serif;
     font-weight: 700;
   }
-  .opp-veryhigh { background: rgba(255,215,0,0.12); color: #ffd700; border: 1px solid rgba(255,215,0,0.4); }
+  .opp-veryhigh { background: rgba(255,23,68,0.12); color: #ff1744; border: 1px solid rgba(255,23,68,0.4); }
   .opp-high { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
   .opp-mid  { background: rgba(0,181,222,0.10); color: var(--ee); border: 1px solid rgba(0,181,222,0.2); }
   .opp-low  { background: rgba(107,114,128,0.15); color: var(--muted); border: 1px solid var(--border); }
@@ -590,7 +590,7 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network (row)</div>
     <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network (row)</div>
-    <div class="legend-item"><div class="opp-badge opp-veryhigh">V.HIGH</div> Opp: EE leads by 15%+</div>
+    <div class="legend-item"><div class="opp-badge opp-veryhigh">VERY HIGH</div> Opp: EE leads by 13%+</div>
     <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> Opp: EE leads by 10–14%</div>
     <div class="legend-item"><div class="opp-badge opp-mid">MED</div> Opp: EE leads by 5–9%</div>
     <div class="legend-item"><div class="opp-badge opp-low">LOW</div> Opp: EE leads by &lt;5%</div>
@@ -817,7 +817,7 @@ function getOpportunity(ee, comps) {
   const maxComp = Math.max(...comps.filter(v => v !== undefined && v !== null));
   if (isNaN(maxComp) || maxComp === -Infinity) return { label: '—', tier: '' };
   const lead = ee - maxComp;
-  if (lead >= 15) return { label: 'Very High', tier: 'veryhigh' };
+  if (lead >= 13) return { label: 'Very High', tier: 'veryhigh' };
   if (lead >= 10) return { label: 'High', tier: 'high' };
   if (lead >= 5) return { label: 'Medium', tier: 'mid' };
   if (lead > 0) return { label: 'Low', tier: 'low' };
