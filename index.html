@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Severnside Coverage — Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #1a1d25;
+    --border: #2a2d38;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --ee: #00b5de;
+    --voda: #e4002b;
+    --o2: #003c8f;
+    --three: #ef7d00;
+    --green: #00e676;
+    --red: #ff1744;
+    --green-bg: rgba(0,230,118,0.08);
+    --red-bg: rgba(255,23,68,0.10);
+    --accent: #00b5de;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .logo-mark {
+    width: 42px; height: 42px;
+    background: var(--ee);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 14px; color: #000;
+    flex-shrink: 0;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 18px;
+    letter-spacing: 0.02em;
+  }
+  header p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .header-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .phase-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .phase-setup { background: rgba(0,181,222,0.15); color: var(--ee); border: 1px solid rgba(0,181,222,0.3); }
+  .phase-analysis { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+
+  /* ── TAB NAV ── */
+  .tab-nav {
+    display: flex;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border);
+    gap: 0;
+  }
+  .tab-btn {
+    padding: 14px 24px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--ee); border-bottom-color: var(--ee); }
+
+  /* ── MAIN PANELS ── */
+  .panel { display: none; padding: 32px 40px; }
+  .panel.active { display: block; }
+
+  /* ── SETUP PANEL ── */
+  .setup-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    height: calc(100vh - 200px);
+  }
+
+  /* Region list */
+  .region-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .region-list-header {
+    padding: 14px 16px;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .region-items { overflow-y: auto; flex: 1; }
+  .region-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: background 0.15s;
+    font-size: 12px;
+  }
+  .region-item:hover { background: var(--surface2); }
+  .region-item.active { background: rgba(0,181,222,0.08); color: var(--ee); }
+  .region-item .region-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 12px; }
+  .region-progress-mini {
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .region-item.done .region-progress-mini { color: var(--green); }
+
+  /* Postcode entry area */
+  .entry-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .entry-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .entry-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .entry-header .progress-text { font-size: 11px; color: var(--muted); }
+  .progress-bar-wrap {
+    height: 3px;
+    background: var(--border);
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--ee);
+    transition: width 0.4s ease;
+  }
+
+  .postcode-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .postcode-row {
+    display: grid;
+    grid-template-columns: 72px 1fr 1fr 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+  }
+  .postcode-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .postcode-row.saved .postcode-label { color: var(--green); }
+
+  .provider-input-wrap { position: relative; }
+  .provider-label {
+    position: absolute;
+    top: 6px; left: 8px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  .provider-label.ee { color: var(--ee); }
+  .provider-label.vodafone { color: var(--voda); }
+  .provider-label.o2 { color: #5b8ecf; }
+  .provider-label.three { color: var(--three); }
+
+  input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 20px 8px 6px;
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus { border-color: var(--ee); }
+  .postcode-row.saved input { border-color: rgba(0,230,118,0.3); }
+
+  .entry-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--ee); color: #000; }
+  .btn-primary:hover { filter: brightness(1.1); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text); }
+  .btn-sm { padding: 7px 14px; font-size: 11px; }
+  .save-status { font-size: 11px; color: var(--green); opacity: 0; transition: opacity 0.4s; margin-left: 8px; }
+  .save-status.show { opacity: 1; }
+
+  .overall-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .overall-progress strong { color: var(--text); font-size: 13px; }
+
+  /* ── ANALYSIS PANEL ── */
+  .analysis-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: center;
+  }
+  .filter-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 160px;
+  }
+  .filter-input:focus { border-color: var(--ee); }
+  select.filter-input { cursor: pointer; }
+  .filter-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .filter-group { display: flex; flex-direction: column; }
+  .toolbar-sep { width: 1px; height: 36px; background: var(--border); margin: 0 4px; align-self: flex-end; }
+
+  /* Table */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .table-stats {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 24px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .table-stats strong { color: var(--text); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    background: var(--surface);
+  }
+  thead th:hover { color: var(--text); }
+  thead th.sort-asc::after { content: ' ↑'; color: var(--ee); }
+  thead th.sort-desc::after { content: ' ↓'; color: var(--ee); }
+  tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  td { padding: 9px 14px; }
+  td.postcode-cell {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  td.region-cell { color: var(--muted); font-size: 11px; }
+
+  /* Provider cells */
+  .coverage-cell { text-align: center; }
+  .coverage-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .coverage-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .coverage-bar-fill { height: 100%; border-radius: 2px; }
+  .coverage-val { font-size: 12px; min-width: 34px; text-align: right; }
+
+  /* Winner/loser highlights */
+  .col-ee { --pcol: var(--ee); }
+  .col-voda { --pcol: var(--voda); }
+  .col-o2 { --pcol: var(--o2); }
+  .col-three { --pcol: var(--three); }
+
+  td.cell-winner {
+    background: var(--green-bg) !important;
+  }
+  td.cell-loser {
+    background: var(--red-bg) !important;
+  }
+  td.cell-winner .coverage-bar-fill { background: var(--green) !important; }
+  td.cell-loser .coverage-bar-fill { background: var(--red) !important; }
+  td.cell-winner .coverage-val { color: var(--green); font-weight: 600; }
+  td.cell-loser .coverage-val { color: var(--red); font-weight: 600; }
+
+  /* Opportunity */
+  .opp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+  .opp-high { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .opp-mid  { background: rgba(0,181,222,0.10); color: var(--ee); border: 1px solid rgba(0,181,222,0.2); }
+  .opp-low  { background: rgba(107,114,128,0.15); color: var(--muted); border: 1px solid var(--border); }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .legend-box {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty-state h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .empty-state p { font-size: 12px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  .table-outer { overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">EE</div>
+  <div>
+    <h1>PatchRegion</h1>
+    <p>Severnside Coverage Intelligence — Built by Dan Barba</p>
+  </div>
+  <div class="header-right" id="headerRight">
+    <span class="phase-badge phase-analysis" id="phaseBadge">Analysis</span>
+  </div>
+</header>
+
+<div class="tab-nav">
+  
+  <button class="tab-btn active" onclick="switchTab('analysis')" id="tabAnalysis">◈ Analysis</button>
+</div>
+
+<div class="panel" id="panelSetup" style="display:none">
+  <div class="setup-layout">
+    <div class="region-list">
+      <div class="region-list-header">
+        <span>Regions</span>
+        <span id="regionCount">0 / 0</span>
+      </div>
+      <div class="region-items" id="regionItems"></div>
+    </div>
+    <div class="entry-area">
+      <div class="entry-header">
+        <div>
+          <h2 id="entryTitle">Select a region</h2>
+          <div class="progress-text" id="entryProgress"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-ghost btn-sm" onclick="saveCurrentRegion()">Save Region</button>
+          <div class="overall-progress">
+            <span>Total:</span>
+            <strong id="overallFilled">0</strong>
+            <span>/ <span id="overallTotal">0</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+      <div class="postcode-grid" id="postcodeGrid">
+        <div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--muted);font-size:13px;">
+          ← Select a region to begin entering coverage data
+        </div>
+      </div>
+      <div class="entry-footer">
+        <button class="btn btn-primary" onclick="saveCurrentRegion()">✓ Save &amp; Continue</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearCurrentRegion()">Clear Region</button>
+        <span class="save-status" id="saveStatus">Saved!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel active" id="panelAnalysis">
+  <div class="analysis-toolbar">
+    <div class="filter-group">
+      <span class="filter-label">Search Postcode</span>
+      <input type="text" class="filter-input" id="filterPostcode" placeholder="e.g. BS1, CF10…" oninput="renderTable()" style="width:150px">
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Region</span>
+      <select class="filter-input" id="filterRegion" onchange="renderTable()" style="width:160px">
+        <option value="">All Regions</option>
+      </select>
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Min EE Coverage</span>
+      <input type="number" class="filter-input" id="filterMinEE" placeholder="0" min="0" max="100" oninput="renderTable()" style="width:100px">
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Max EE Coverage</span>
+      <input type="number" class="filter-input" id="filterMaxEE" placeholder="100" min="0" max="100" oninput="renderTable()" style="width:100px">
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Opportunity</span>
+      <select class="filter-input" id="filterOpp" onchange="renderTable()" style="width:130px">
+        <option value="">All</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Winner</span>
+      <select class="filter-input" id="filterWinner" onchange="renderTable()" style="width:120px">
+        <option value="">Any</option>
+        <option value="EE">EE</option>
+        <option value="Vodafone">Vodafone</option>
+        <option value="O2">O2</option>
+        <option value="Three">Three</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Loser</span>
+      <select class="filter-input" id="filterLoser" onchange="renderTable()" style="width:120px">
+        <option value="">Any</option>
+        <option value="EE">EE</option>
+        <option value="Vodafone">Vodafone</option>
+        <option value="O2">O2</option>
+        <option value="Three">Three</option>
+      </select>
+    </div>
+    <div class="toolbar-sep"></div>
+    <button class="btn btn-ghost btn-sm" onclick="clearFilters()" style="align-self:flex-end">✕ Clear Filters</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network (row)</div>
+    <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network (row)</div>
+    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> Opp: EE leads by 10%+</div>
+    <div class="legend-item"><div class="opp-badge opp-mid">MED</div> Opp: EE leads by 5–9%</div>
+    <div class="legend-item"><div class="opp-badge opp-low">LOW</div> Opp: EE leads by &lt;5%</div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-stats" id="tableStats"></div>
+    <div class="table-outer">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('postcode')" id="th-postcode">Postcode</th>
+            <th onclick="sortBy('region')" id="th-region">Region</th>
+            <th onclick="sortBy('ee')" id="th-ee" style="color:var(--ee)">EE</th>
+            <th onclick="sortBy('vodafone')" id="th-vodafone" style="color:var(--voda)">Vodafone</th>
+            <th onclick="sortBy('o2')" id="th-o2" style="color:#5b8ecf">O2</th>
+            <th onclick="sortBy('three')" id="th-three" style="color:var(--three)">Three</th>
+            <th onclick="sortBy('opportunity')" id="th-opportunity">Opportunity</th>
+            <th onclick="sortBy('winner')" id="th-winner">Best Network</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="toast">✓ Data saved locally</div>
+
+<script>
+// ══ DATA ══════════════════════════════════════════════════════════════════
+const REGIONS = {
+  "Bath": ["BA1","BA10","BA11","BA12","BA13","BA14","BA15","BA16","BA2","BA3","BA4","BA5","BA6","BA7","BA8","BA9"],
+  "Bristol": ["BS0","BS1","BS10","BS11","BS13","BS14","BS15","BS16","BS2","BS20","BS21","BS22","BS23","BS24","BS25","BS26","BS27","BS28","BS29","BS3","BS30","BS31","BS32","BS34","BS35","BS36","BS37","BS39","BS4","BS40","BS41","BS48","BS49","BS5","BS6","BS7","BS8","BS9","BS98","BS99"],
+  "Cardiff": ["CF10","CF11","CF14","CF15","CF23","CF24","CF3","CF30","CF31","CF32","CF33","CF34","CF35","CF36","CF37","CF38","CF39","CF40","CF41","CF42","CF43","CF44","CF45","CF46","CF47","CF48","CF5","CF61","CF62","CF63","CF64","CF71","CF72","CF81","CF82","CF83","CF91","CF95","CF99"],
+  "Enfield": ["EN5"],
+  "Gloucester": ["GL1","GL10","GL11","GL12","GL13","GL14","GL15","GL16","GL17","GL18","GL19","GL2","GL3","GL4","GL5","GL50","GL51","GL52","GL53","GL54","GL56","GL6","GL7","GL8","GL9"],
+  "Harrow": ["HA0","HA1","HA2","HA3","HA4","HA5","HA6","HA7","HA8","HA9"],
+  "Llandrindod Wells": ["LD1","LD2","LD3","LD4","LD5","LD6","LD7","LD8"],
+  "Newport": ["NP1","NP10","NP11","NP12","NP13","NP15","NP16","NP18","NP19","NP20","NP22","NP23","NP24","NP25","NP26","NP4","NP44","NP7","NP8"],
+  "North London": ["N10","N11","N12","N19","N2","N20","N3","N5","N6","N7"],
+  "North West London": ["NW10","NW11","NW2","NW26","NW3","NW4","NW5","NW6","NW7","NW9"],
+  "Oxford": ["OX11","OX12"],
+  "Reading": ["RG14","RG17","RG18","RG19","RG20","RG21","RG22","RG23","RG24","RG25","RG26","RG28","RG8"],
+  "Salisbury": ["SP1","SP10","SP11","SP2","SP3","SP4","SP5","SP6","SP7","SP8","SP9"],
+  "Southall": ["UB1","UB10","UB4","UB5","UB6","UB8","UB9"],
+  "Southampton": ["SO14","SO15","SO16","SO17","SO18","SO19","SO20","SO21","SO22","SO23","SO24","SO25","SO30","SO31","SO32","SO40","SO41","SO42","SO43","SO45","SO50","SO51","SO52","SO53","SO97"],
+  "Swansea": ["SA1","SA10","SA11","SA12","SA13","SA14","SA15","SA16","SA17","SA18","SA19","SA2","SA20","SA3","SA31","SA32","SA33","SA34","SA35","SA36","SA37","SA38","SA39","SA4","SA40","SA41","SA42","SA43","SA44","SA45","SA46","SA47","SA48","SA5","SA6","SA61","SA62","SA63","SA64","SA65","SA66","SA67","SA68","SA69","SA7","SA70","SA71","SA72","SA73","SA8","SA80","SA9","SA99"],
+  "Swindon": ["SN1","SN10","SN11","SN12","SN13","SN14","SN15","SN16","SN2","SN25","SN26","SN3","SN38","SN4","SN5","SN6","SN7","SN8","SN9","SN99"],
+  "Watford": ["WD99"]
+};
+
+const STORAGE_KEY = 'severnside_coverage_v1';
+const PROVIDERS = ['ee','vodafone','o2','three'];
+const PROVIDER_LABELS = { ee: 'EE', vodafone: 'Vodafone', o2: 'O2', three: 'Three' };
+const PROVIDER_COLORS = { ee: '#00b5de', vodafone: '#e4002b', o2: '#5b8ecf', three: '#ef7d00' };
+
+let data = {}; // { [postcode]: { ee, vodafone, o2, three } }
+let currentRegion = null;
+let sortCol = 'postcode';
+let sortDir = 1;
+
+// ══ STORAGE ═══════════════════════════════════════════════════════════════
+function loadData() {
+  // Data is baked in — no localStorage needed
+  data = {"BA1":{"ee":79,"vodafone":73,"o2":54,"three":73},"BA10":{"ee":73,"vodafone":68,"o2":55,"three":73},"BA11":{"ee":76,"vodafone":60,"o2":57,"three":72},"BA12":{"ee":69,"vodafone":67,"o2":61,"three":68},"BA13":{"ee":82,"vodafone":69,"o2":56,"three":75},"BA14":{"ee":72,"vodafone":64,"o2":56,"three":74},"BA15":{"ee":73,"vodafone":68,"o2":55,"three":73},"BA16":{"ee":73,"vodafone":68,"o2":55,"three":73},"BA2":{"ee":74,"vodafone":71,"o2":51,"three":77},"BA3":{"ee":77,"vodafone":67,"o2":53,"three":76},"BA4":{"ee":76,"vodafone":75,"o2":48,"three":68},"BA5":{"ee":73,"vodafone":68,"o2":55,"three":73},"BA6":{"ee":68,"vodafone":66,"o2":52,"three":80},"BA7":{"ee":73,"vodafone":68,"o2":55,"three":73},"BA8":{"ee":73,"vodafone":68,"o2":55,"three":73},"BA9":{"ee":66,"vodafone":79,"o2":71,"three":78},"EN5":{"ee":84,"vodafone":77,"o2":82,"three":76},"HA0":{"ee":87,"vodafone":86,"o2":76,"three":82},"HA1":{"ee":83,"vodafone":74,"o2":78,"three":77},"HA2":{"vodafone":85,"ee":83,"o2":80,"three":79},"HA3":{"ee":87,"vodafone":84,"o2":80,"three":80},"HA4":{"ee":88,"vodafone":79,"o2":80,"three":80},"HA5":{"ee":86,"vodafone":82,"o2":82,"three":78},"HA6":{"ee":83,"vodafone":83,"o2":81,"three":79},"HA7":{"ee":90,"vodafone":80,"o2":81,"three":74},"HA8":{"ee":87,"vodafone":86,"o2":81,"three":76},"HA9":{"ee":86,"vodafone":82,"o2":79,"three":82},"WD99":{"ee":0,"vodafone":0,"o2":0,"three":0},"UB1":{"ee":84,"vodafone":69,"o2":76,"three":78},"UB10":{"ee":84,"vodafone":83,"o2":79,"three":86},"UB4":{"ee":81,"vodafone":82,"o2":82,"three":84},"UB5":{"ee":83,"vodafone":79,"o2":81,"three":88},"UB6":{"ee":88,"vodafone":84,"o2":79,"three":84},"UB8":{"ee":87,"vodafone":81,"o2":79,"three":80},"UB9":{"ee":82,"vodafone":81,"o2":80,"three":77},"LD1":{"ee":47,"vodafone":50,"o2":62,"three":43},"LD2":{"ee":67,"vodafone":58,"o2":61,"three":66},"LD3":{"ee":79,"vodafone":58,"o2":49,"three":80},"LD4":{"ee":67,"vodafone":58,"o2":61,"three":66},"LD5":{"ee":67,"vodafone":58,"o2":61,"three":66},"LD6":{"ee":67,"vodafone":58,"o2":61,"three":66},"LD7":{"ee":67,"vodafone":58,"o2":61,"three":66},"LD8":{"ee":67,"vodafone":58,"o2":61,"three":66},"OX11":{"ee":77,"vodafone":64,"o2":68,"three":70},"OX12":{"ee":68,"vodafone":58,"o2":66,"three":72},"BS0":{"ee":0,"vodafone":0,"o2":0,"three":0},"BS1":{"ee":83,"vodafone":80,"o2":62,"three":74},"BS10":{"ee":82,"vodafone":81,"o2":82,"three":79},"BS11":{"ee":86,"vodafone":80,"o2":80,"three":83},"BS13":{"ee":83,"vodafone":59,"o2":76,"three":89},"BS14":{"ee":83,"vodafone":81,"o2":73,"three":81},"BS15":{"ee":88,"vodafone":85,"o2":63,"three":72},"BS16":{"vodafone":86,"o2":71,"three":77,"ee":83},"BS2":{"ee":84,"vodafone":83,"o2":61,"three":71},"BS20":{"ee":86,"vodafone":74,"o2":65,"three":68},"BS21":{"ee":82,"vodafone":71,"o2":66,"three":67},"BS22":{"ee":0,"vodafone":0,"o2":0,"three":0},"BS23":{"ee":77,"vodafone":68,"o2":67,"three":68},"BS24":{"ee":76,"vodafone":73,"o2":57,"three":75},"BS25":{"ee":81,"vodafone":77,"o2":68,"three":75},"BS26":{"ee":81,"vodafone":77,"o2":68,"three":75},"BS27":{"ee":81,"vodafone":77,"o2":68,"three":75},"BS28":{"ee":81,"vodafone":77,"o2":68,"three":75},"BS29":{"ee":81,"vodafone":77,"o2":68,"three":75},"BS3":{"ee":80,"vodafone":80,"o2":73,"three":78},"BS30":{"ee":85,"vodafone":80,"o2":67,"three":82},"BS31":{"ee":72,"vodafone":80,"o2":74,"three":71},"BS32":{"ee":83,"vodafone":69,"o2":69,"three":85},"BS34":{"ee":75,"vodafone":82,"o2":76,"three":78},"BS35":{"ee":79,"vodafone":81,"o2":75,"three":67},"BS36":{"ee":80,"vodafone":70,"o2":72,"three":76},"BS37":{"ee":77,"vodafone":79,"o2":66,"three":72},"BS39":{"ee":81,"vodafone":77,"o2":68,"three":75},"BS4":{"ee":88,"vodafone":82,"o2":70,"three":71},"BS40":{"ee":70,"vodafone":66,"o2":60,"three":61},"BS41":{"ee":81,"vodafone":77,"o2":68,"three":75},"BS48":{"ee":83,"vodafone":75,"o2":65,"three":63},"BS49":{"ee":71,"vodafone":54,"o2":49,"three":57},"BS5":{"ee":84,"vodafone":80,"o2":65,"three":77},"BS6":{"ee":84,"vodafone":68,"o2":52,"three":79},"BS7":{"ee":77,"vodafone":81,"o2":69,"three":78},"BS8":{"ee":82,"vodafone":74,"o2":59,"three":73},"BS9":{"ee":79,"vodafone":73,"o2":74,"three":81},"BS98":{"ee":0,"vodafone":0,"o2":0,"three":0},"BS99":{"ee":0,"vodafone":0,"o2":0,"three":0},"NW10":{"ee":86,"vodafone":86,"o2":83,"three":80},"NW11":{"ee":84,"vodafone":84,"o2":80,"three":67},"NW2":{"vodafone":85,"ee":78,"o2":82,"three":76},"NW26":{"ee":0,"vodafone":0,"o2":0,"three":0},"NW3":{"ee":85,"vodafone":83,"o2":82,"three":79},"NW4":{"ee":87,"vodafone":81,"o2":79,"three":81},"NW5":{"ee":89,"vodafone":84,"o2":88,"three":75},"NW6":{"ee":86,"vodafone":79,"o2":82,"three":80},"NW7":{"ee":83,"vodafone":81,"o2":79,"three":79},"NW9":{"ee":86,"vodafone":79,"o2":77,"three":80},"N10":{"ee":83,"vodafone":82,"o2":78,"three":68},"N11":{"ee":88,"vodafone":83,"o2":81,"three":80},"N12":{"ee":82,"vodafone":78,"o2":79,"three":72},"N19":{"three":89,"ee":84,"vodafone":84,"o2":84},"N2":{"ee":77,"vodafone":83,"o2":81,"three":66},"N20":{"three":87,"ee":84,"vodafone":81,"o2":70},"N3":{"ee":86,"vodafone":82,"o2":78,"three":76},"N5":{"ee":87,"vodafone":81,"o2":80,"three":84},"N6":{"ee":84,"vodafone":84,"o2":73,"three":74},"N7":{"ee":88,"vodafone":85,"o2":81,"three":81},"SP1":{"ee":83,"vodafone":85,"o2":69,"three":79},"SP10":{"ee":86,"vodafone":74,"o2":67,"three":64},"SP11":{"o2":75,"vodafone":67,"ee":74,"three":72},"SP2":{"ee":78,"vodafone":72,"o2":75,"three":71},"SP3":{"ee":73,"vodafone":80,"o2":74,"three":73},"SP4":{"o2":72,"vodafone":72,"ee":68,"three":48},"SP5":{"o2":75,"ee":66,"vodafone":75,"three":48},"SP6":{"ee":69,"vodafone":64,"o2":48,"three":70},"SP7":{"ee":80,"vodafone":81,"o2":67,"three":76},"SP8":{"ee":76,"vodafone":74,"o2":70,"three":67},"SP9":{"ee":91,"vodafone":82,"o2":67,"three":80},"RG14":{"ee":84,"vodafone":76,"o2":77,"three":78},"RG17":{"ee":66,"vodafone":72,"o2":77,"three":81},"RG18":{"vodafone":78,"ee":70,"o2":62,"three":64},"RG19":{"ee":78,"vodafone":73,"o2":59,"three":75},"RG20":{"ee":74,"vodafone":67,"o2":70,"three":55},"RG21":{"ee":0,"vodafone":0,"o2":0,"three":0},"RG22":{"three":79,"vodafone":79,"o2":74,"ee":77},"RG23":{"ee":81,"vodafone":69,"o2":70,"three":69},"RG24":{"ee":0,"vodafone":0,"o2":0,"three":0},"RG25":{"ee":0,"vodafone":0,"o2":0,"three":0},"RG26":{"ee":73,"vodafone":72,"o2":73,"three":55},"RG28":{"ee":79,"vodafone":76,"o2":75,"three":76},"RG8":{"ee":79,"vodafone":76,"o2":75,"three":75},"NP1":{"ee":0,"vodafone":0,"o2":0,"three":0},"NP10":{"ee":83,"vodafone":75,"o2":73,"three":78},"NP11":{"ee":79,"vodafone":78,"o2":71,"three":78},"NP12":{"ee":79,"vodafone":71,"o2":52,"three":78},"NP13":{"ee":90,"vodafone":80,"o2":67,"three":72},"NP15":{"ee":81,"vodafone":78,"o2":68,"three":76},"NP16":{"ee":84,"vodafone":84,"o2":73,"three":82},"NP18":{"ee":78,"vodafone":82,"o2":62,"three":76},"NP19":{"ee":84,"vodafone":83,"o2":66,"three":77},"NP20":{"ee":82,"vodafone":82,"o2":78,"three":71},"NP22":{"ee":76,"vodafone":77,"o2":56,"three":62},"NP23":{"ee":83,"vodafone":71,"o2":58,"three":77},"NP24":{"ee":81,"vodafone":78,"o2":68,"three":76},"NP25":{"ee":81,"vodafone":78,"o2":68,"three":76},"NP26":{"ee":83,"vodafone":81,"o2":80,"three":76},"NP4":{"three":78,"ee":77,"vodafone":69,"o2":55},"NP44":{"ee":84,"vodafone":82,"o2":70,"three":79},"NP7":{"three":82,"ee":80,"vodafone":65,"o2":63},"NP8":{"ee":81,"vodafone":78,"o2":68,"three":76},"CF10":{"ee":81,"three":77,"vodafone":76,"o2":68},"CF11":{"three":80,"o2":80,"ee":78,"vodafone":78},"CF14":{"vodafone":81,"ee":79,"o2":77,"three":72},"CF15":{"ee":80,"vodafone":72,"o2":59,"three":76},"CF23":{"ee":82,"vodafone":79,"o2":70,"three":82},"CF24":{"ee":84,"vodafone":73,"o2":69,"three":78},"CF3":{"ee":79,"vodafone":78,"o2":79,"three":83},"CF30":{"o2":0,"ee":0,"vodafone":0,"three":0},"CF31":{"ee":83,"vodafone":73,"o2":47,"three":69},"CF32":{"ee":77,"vodafone":70,"o2":47,"three":83},"CF33":{"ee":81,"vodafone":81,"o2":75,"three":67},"CF34":{"ee":85,"vodafone":77,"o2":58,"three":82},"CF35":{"ee":80,"vodafone":78,"o2":66,"three":67},"CF36":{"three":86,"ee":83,"vodafone":81,"o2":62},"CF37":{"ee":84,"vodafone":69,"o2":50,"three":70},"CF38":{"ee":81,"vodafone":67,"o2":45,"three":78},"CF39":{"ee":81,"vodafone":65,"o2":58,"three":80},"CF40":{"ee":87,"vodafone":83,"o2":54,"three":78},"CF41":{"three":88,"ee":82,"vodafone":82,"o2":56},"CF42":{"three":87,"ee":75,"vodafone":65,"o2":67},"CF43":{"three":78,"ee":75,"vodafone":74,"o2":49},"CF44":{"ee":73,"vodafone":63,"o2":42,"three":65},"CF45":{"ee":73,"vodafone":65,"o2":48,"three":69},"CF46":{"ee":81,"vodafone":77,"o2":67,"three":78},"CF47":{"ee":79,"vodafone":82,"o2":65,"three":84},"CF48":{"three":80,"ee":79,"vodafone":79,"o2":59},"CF5":{"three":82,"vodafone":82,"o2":79,"ee":78},"CF61":{"three":83,"o2":58,"vodafone":73,"ee":77},"CF62":{"ee":81,"vodafone":84,"o2":76,"three":82},"CF63":{"ee":86,"vodafone":87,"o2":71,"three":86},"CF64":{"ee":82,"vodafone":82,"o2":76,"three":81},"CF71":{"ee":81,"vodafone":77,"o2":67,"three":78},"CF72":{"ee":86,"vodafone":76,"o2":50,"three":70},"CF81":{"ee":84,"vodafone":81,"o2":79,"three":67},"CF82":{"ee":78,"vodafone":74,"o2":57,"three":82},"CF83":{"ee":76,"vodafone":80,"o2":71,"three":83},"CF91":{"ee":0,"vodafone":0,"o2":0,"three":0},"CF95":{"ee":0,"vodafone":0,"o2":0,"three":0},"CF99":{"ee":81,"vodafone":77,"o2":67,"three":78},"GL1":{"ee":82,"vodafone":79,"o2":75,"three":80},"GL10":{"three":83,"ee":82,"o2":72,"vodafone":66},"GL11":{"vodafone":82,"ee":70,"o2":70,"three":68},"GL12":{"ee":81,"vodafone":75,"o2":80,"three":57},"GL13":{"ee":78,"vodafone":71,"o2":68,"three":77},"GL14":{"ee":79,"vodafone":74,"o2":76,"three":74},"GL15":{"o2":74,"three":70,"ee":69,"vodafone":67},"GL16":{"o2":80,"three":60,"ee":60,"vodafone":72},"GL17":{"ee":81,"vodafone":56,"o2":70,"three":80},"GL18":{"ee":78,"vodafone":71,"o2":68,"three":77},"GL19":{"ee":74,"three":69,"vodafone":59,"o2":45},"GL2":{"three":81,"ee":79,"vodafone":71,"o2":65},"GL3":{"ee":81,"vodafone":74,"o2":57,"three":72},"GL4":{"ee":85,"vodafone":76,"o2":69,"three":82},"GL5":{"ee":81,"vodafone":69,"o2":68,"three":80},"GL50":{"ee":83,"vodafone":76,"o2":72,"three":75},"GL51":{"three":85,"ee":83,"vodafone":80,"o2":77},"GL52":{"ee":75,"three":72,"vodafone":72,"o2":53},"GL53":{"ee":81,"vodafone":68,"o2":69,"three":77},"GL54":{"ee":72,"vodafone":59,"o2":63,"three":67},"GL56":{"ee":78,"vodafone":71,"o2":68,"three":77},"GL6":{"ee":73,"vodafone":63,"o2":57,"three":67},"GL7":{"ee":75,"vodafone":64,"o2":64,"three":64},"GL8":{"o2":87,"ee":74,"vodafone":66,"three":73},"GL9":{"ee":78,"vodafone":71,"o2":68,"three":77},"SA1":{"ee":77,"vodafone":71,"o2":62,"three":81},"SA10":{"ee":82,"vodafone":78,"o2":54,"three":75},"SA11":{"ee":82,"vodafone":77,"o2":57,"three":71},"SA12":{"ee":86,"vodafone":73,"o2":50,"three":86},"SA13":{"ee":81,"vodafone":76,"o2":56,"three":79},"SA14":{"ee":76,"vodafone":73,"o2":57,"three":73},"SA15":{"ee":83,"vodafone":74,"o2":57,"three":78},"SA16":{"ee":84,"vodafone":70,"o2":74,"three":79},"SA17":{"ee":61,"vodafone":72,"o2":63,"three":74},"SA18":{"ee":74,"vodafone":80,"o2":62,"three":77},"SA19":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA2":{"vodafone":82,"ee":77,"o2":68,"three":77},"SA20":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA3":{"ee":70,"vodafone":75,"o2":69,"three":79},"SA31":{"vodafone":67,"ee":66,"o2":60,"three":59},"SA32":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA33":{"ee":73,"vodafone":70,"o2":63,"three":53},"SA34":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA35":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA36":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA37":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA38":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA39":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA4":{"ee":73,"vodafone":69,"o2":61,"three":76},"SA40":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA41":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA42":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA43":{"ee":67,"vodafone":65,"o2":59,"three":56},"SA44":{"ee":75,"vodafone":73,"o2":57,"three":67},"SA45":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA46":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA47":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA48":{"ee":70,"vodafone":74,"o2":68,"three":68},"SA5":{"ee":84,"vodafone":69,"o2":58,"three":82},"SA6":{"ee":83,"vodafone":68,"o2":47,"three":76},"SA61":{"ee":79,"vodafone":81,"o2":68,"three":76},"SA62":{"ee":66,"vodafone":73,"o2":71,"three":54},"SA63":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA64":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA65":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA66":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA67":{"ee":80,"vodafone":68,"o2":61,"three":60},"SA68":{"ee":76,"vodafone":73,"o2":61,"three":75},"SA69":{"ee":81,"vodafone":73,"o2":69,"three":76},"SA7":{"ee":79,"vodafone":72,"o2":43,"three":83},"SA70":{"ee":76,"vodafone":60,"o2":46,"three":38},"SA71":{"ee":68,"vodafone":78,"o2":59,"three":71},"SA72":{"ee":71,"vodafone":82,"o2":70,"three":67},"SA73":{"ee":85,"vodafone":69,"o2":69,"three":84},"SA8":{"ee":75,"vodafone":79,"o2":66,"three":87},"SA80":{"ee":0,"vodafone":0,"o2":0,"three":0},"SA9":{"ee":82,"vodafone":85,"o2":75,"three":84},"SA99":{"ee":0,"vodafone":0,"o2":0,"three":0},"SN1":{"ee":84,"vodafone":75,"o2":63,"three":71},"SN10":{"ee":76,"vodafone":79,"o2":65,"three":72},"SN11":{"ee":75,"vodafone":67,"o2":67,"three":74},"SN12":{"ee":78,"vodafone":80,"o2":75,"three":79},"SN13":{"ee":74,"vodafone":76,"o2":72,"three":75},"SN14":{"ee":64,"vodafone":65,"o2":68,"three":72},"SN15":{"ee":79,"vodafone":68,"o2":72,"three":71},"SN16":{"ee":72,"vodafone":79,"o2":67,"three":64},"SN2":{"ee":86,"vodafone":76,"o2":74,"three":71},"SN25":{"ee":79,"vodafone":75,"o2":68,"three":87},"SN26":{"ee":77,"vodafone":75,"o2":71,"three":75},"SN3":{"ee":79,"vodafone":83,"o2":75,"three":85},"SN38":{"ee":77,"vodafone":75,"o2":71,"three":75},"SN4":{"ee":81,"vodafone":75,"o2":74,"three":62},"SN5":{"ee":79,"vodafone":81,"o2":75,"three":84},"SN6":{"ee":73,"vodafone":74,"o2":71,"three":69},"SN7":{"ee":77,"vodafone":75,"o2":71,"three":75},"SN8":{"ee":68,"vodafone":64,"o2":63,"three":60},"SN9":{"ee":77,"vodafone":75,"o2":71,"three":75},"SN99":{"ee":0,"vodafone":0,"o2":0,"three":0},"SO14":{"ee":77,"vodafone":83,"o2":76,"three":70},"SO15":{"ee":82,"vodafone":81,"o2":76,"three":76},"SO16":{"ee":86,"vodafone":79,"o2":74,"three":77},"SO17":{"ee":81,"vodafone":80,"o2":73,"three":73},"SO18":{"ee":82,"vodafone":90,"o2":77,"three":85},"SO19":{"ee":77,"vodafone":79,"o2":79,"three":87},"SO20":{"ee":80,"vodafone":78,"o2":73,"three":76},"SO21":{"ee":76,"vodafone":69,"o2":60,"three":70},"SO22":{"ee":71,"vodafone":65,"o2":65,"three":56},"SO23":{"ee":80,"vodafone":70,"o2":67,"three":68},"SO24":{"ee":73,"vodafone":69,"o2":69,"three":61},"SO25":{"ee":0,"vodafone":0,"o2":0,"three":0},"SO30":{"ee":80,"vodafone":76,"o2":67,"three":81},"SO31":{"ee":84,"vodafone":81,"o2":80,"three":78},"SO32":{"ee":76,"vodafone":65,"o2":60,"three":74},"SO40":{"ee":83,"vodafone":79,"o2":75,"three":79},"SO41":{"ee":68,"vodafone":74,"o2":55,"three":76},"SO42":{"ee":67,"vodafone":81,"o2":71,"three":62},"SO43":{"ee":75,"vodafone":70,"o2":68,"three":71},"SO45":{"ee":80,"vodafone":84,"o2":80,"three":71},"SO50":{"ee":0,"vodafone":0,"o2":0,"three":0},"SO51":{"ee":76,"vodafone":72,"o2":67,"three":60},"SO52":{"ee":80,"vodafone":78,"o2":73,"three":76},"SO53":{"ee":86,"vodafone":74,"o2":76,"three":84},"SO97":{"ee":0,"vodafone":0,"o2":0,"three":0}};
+}
+function saveData() {
+  // Read-only shared version — no saving needed
+}
+
+// ══ SETUP TAB ═════════════════════════════════════════════════════════════
+function buildRegionList() {
+  const el = document.getElementById('regionItems');
+  el.innerHTML = '';
+  let totalPCs = 0, filledPCs = 0;
+  Object.entries(REGIONS).forEach(([region, pcs]) => {
+    totalPCs += pcs.length;
+    const filled = pcs.filter(pc => isFilledPC(pc)).length;
+    filledPCs += filled;
+    const done = filled === pcs.length;
+    const div = document.createElement('div');
+    div.className = 'region-item' + (done ? ' done' : '') + (region === currentRegion ? ' active' : '');
+    div.innerHTML = `<span class="region-name">${region}</span><span class="region-progress-mini">${filled}/${pcs.length}</span>`;
+    div.onclick = () => selectRegion(region);
+    el.appendChild(div);
+  });
+  document.getElementById('regionCount').textContent = `${Object.keys(REGIONS).length} regions`;
+  document.getElementById('overallFilled').textContent = filledPCs;
+  document.getElementById('overallTotal').textContent = totalPCs;
+}
+
+function isFilledPC(pc) {
+  const d = data[pc];
+  if (!d) return false;
+  return PROVIDERS.some(p => d[p] !== undefined && d[p] !== '' && d[p] !== null);
+}
+
+function selectRegion(region) {
+  currentRegion = region;
+  buildRegionList();
+  renderPostcodeGrid();
+}
+
+function renderPostcodeGrid() {
+  if (!currentRegion) return;
+  const pcs = REGIONS[currentRegion];
+  const el = document.getElementById('postcodeGrid');
+  el.innerHTML = '';
+
+  // Header row
+  const hdr = document.createElement('div');
+  hdr.className = 'postcode-row';
+  hdr.style.cssText = 'font-size:10px;color:var(--muted);margin-bottom:2px;font-family:Syne,sans-serif;font-weight:700;letter-spacing:.06em;text-transform:uppercase;';
+  hdr.innerHTML = `<div>Postcode</div><div>EE</div><div>Vodafone</div><div>O2</div><div>Three</div>`;
+  el.appendChild(hdr);
+
+  pcs.forEach(pc => {
+    const d = data[pc] || {};
+    const filled = isFilledPC(pc);
+    const row = document.createElement('div');
+    row.className = 'postcode-row' + (filled ? ' saved' : '');
+    row.id = 'row_' + pc;
+
+    row.innerHTML = `
+      <div class="postcode-label">${pc}</div>
+      ${PROVIDERS.map(p => `
+        <div class="provider-input-wrap">
+          <span class="provider-label ${p}">${PROVIDER_LABELS[p]}</span>
+          <input type="number" min="0" max="100" placeholder="—"
+            id="inp_${pc}_${p}"
+            value="${d[p] !== undefined ? d[p] : ''}"
+            onchange="autoSaveCell('${pc}','${p}',this.value)"
+            onkeydown="handleKey(event,'${pc}','${p}')">
+        </div>`).join('')}
+    `;
+    el.appendChild(row);
+  });
+
+  updateEntryProgress();
+  document.getElementById('entryTitle').textContent = currentRegion;
+}
+
+function handleKey(e, pc, provider) {
+  if (e.key === 'Enter' || e.key === 'Tab') {
+    autoSaveCell(pc, provider, e.target.value);
+  }
+}
+
+function autoSaveCell(pc, provider, val) {
+  if (!data[pc]) data[pc] = {};
+  const num = parseFloat(val);
+  data[pc][provider] = isNaN(num) ? undefined : Math.min(100, Math.max(0, num));
+  saveData();
+  // Update row saved class
+  const row = document.getElementById('row_' + pc);
+  if (row) {
+    row.className = 'postcode-row' + (isFilledPC(pc) ? ' saved' : '');
+  }
+  updateEntryProgress();
+  buildRegionList();
+}
+
+function saveCurrentRegion() {
+  if (!currentRegion) return;
+  const pcs = REGIONS[currentRegion];
+  pcs.forEach(pc => {
+    PROVIDERS.forEach(p => {
+      const inp = document.getElementById(`inp_${pc}_${p}`);
+      if (inp) autoSaveCell(pc, p, inp.value);
+    });
+  });
+  const status = document.getElementById('saveStatus');
+  status.classList.add('show');
+  setTimeout(() => status.classList.remove('show'), 2000);
+}
+
+function clearCurrentRegion() {
+  if (!currentRegion || !confirm(`Clear all data for ${currentRegion}?`)) return;
+  REGIONS[currentRegion].forEach(pc => { delete data[pc]; });
+  saveData();
+  renderPostcodeGrid();
+  buildRegionList();
+}
+
+function updateEntryProgress() {
+  if (!currentRegion) return;
+  const pcs = REGIONS[currentRegion];
+  const filled = pcs.filter(pc => isFilledPC(pc)).length;
+  const pct = Math.round(filled / pcs.length * 100);
+  document.getElementById('entryProgress').textContent = `${filled} of ${pcs.length} postcodes have data`;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+// ══ ANALYSIS TAB ══════════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.getElementById('panelSetup').classList.toggle('active', tab === 'setup');
+  document.getElementById('panelAnalysis').classList.toggle('active', tab === 'analysis');
+  document.getElementById('tabSetup').classList.toggle('active', tab === 'setup');
+  document.getElementById('tabAnalysis').classList.toggle('active', tab === 'analysis');
+  document.getElementById('phaseBadge').className = 'phase-badge ' + (tab === 'setup' ? 'phase-setup' : 'phase-analysis');
+  document.getElementById('phaseBadge').textContent = tab === 'setup' ? 'Setup Phase' : 'Analysis Phase';
+
+  if (tab === 'analysis') {
+    populateRegionFilter();
+    renderTable();
+  }
+}
+
+function populateRegionFilter() {
+  const sel = document.getElementById('filterRegion');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All Regions</option>';
+  Object.keys(REGIONS).forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r; opt.textContent = r;
+    if (r === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function getOpportunity(ee, comps) {
+  if (ee === undefined || ee === null) return { label: '—', tier: '' };
+  const maxComp = Math.max(...comps.filter(v => v !== undefined && v !== null));
+  if (isNaN(maxComp) || maxComp === -Infinity) return { label: '—', tier: '' };
+  const lead = ee - maxComp;
+  if (lead >= 10) return { label: 'High', tier: 'high' };
+  if (lead >= 5) return { label: 'Medium', tier: 'mid' };
+  if (lead > 0) return { label: 'Low', tier: 'low' };
+  return { label: '—', tier: '' };
+}
+
+function buildRows() {
+  const rows = [];
+  Object.entries(REGIONS).forEach(([region, pcs]) => {
+    pcs.forEach(pc => {
+      const d = data[pc] || {};
+      rows.push({
+        postcode: pc, region,
+        ee: d.ee !== undefined ? d.ee : null,
+        vodafone: d.vodafone !== undefined ? d.vodafone : null,
+        o2: d.o2 !== undefined ? d.o2 : null,
+        three: d.three !== undefined ? d.three : null,
+      });
+    });
+  });
+  return rows;
+}
+
+function renderTable() {
+  const rows = buildRows();
+  const pcFilter = document.getElementById('filterPostcode').value.trim().toUpperCase();
+  const regionFilter = document.getElementById('filterRegion').value;
+  const minEE = document.getElementById('filterMinEE').value !== '' ? +document.getElementById('filterMinEE').value : null;
+  const maxEE = document.getElementById('filterMaxEE').value !== '' ? +document.getElementById('filterMaxEE').value : null;
+  const oppFilter = document.getElementById('filterOpp').value;
+  const winnerFilter = document.getElementById('filterWinner').value;
+  const loserFilter = document.getElementById('filterLoser').value;
+
+  let filtered = rows.filter(r => {
+    if (pcFilter && !r.postcode.includes(pcFilter)) return false;
+    if (regionFilter && r.region !== regionFilter) return false;
+    if (minEE !== null && (r.ee === null || r.ee < minEE)) return false;
+    if (maxEE !== null && (r.ee === null || r.ee > maxEE)) return false;
+
+
+    const opp = getOpportunity(r.ee, [r.vodafone, r.o2, r.three]);
+    if (oppFilter && opp.label !== oppFilter) return false;
+
+    if (winnerFilter || loserFilter) {
+      const named = { EE: r.ee, Vodafone: r.vodafone, O2: r.o2, Three: r.three };
+      const definedVals = Object.entries(named).filter(([,v]) => v !== null);
+      if (definedVals.length > 0) {
+        const maxVal = Math.max(...definedVals.map(([,v]) => v));
+        const minVal = Math.min(...definedVals.map(([,v]) => v));
+        const winner = definedVals.find(([,v]) => v === maxVal)?.[0];
+        const loser = definedVals.find(([,v]) => v === minVal)?.[0];
+        if (winnerFilter && winner !== winnerFilter) return false;
+        if (loserFilter && loser !== loserFilter) return false;
+      } else {
+        if (winnerFilter || loserFilter) return false;
+      }
+    }
+    return true;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    let av = a[sortCol], bv = b[sortCol];
+    if (sortCol === 'opportunity') {
+      const tierMap = { 'High': 3, 'Medium': 2, 'Low': 1, '—': 0 };
+      av = tierMap[getOpportunity(a.ee, [a.vodafone, a.o2, a.three]).label] || 0;
+      bv = tierMap[getOpportunity(b.ee, [b.vodafone, b.o2, b.three]).label] || 0;
+    }
+    if (sortCol === 'winner') {
+      av = getWinner(a) || '';
+      bv = getWinner(b) || '';
+    }
+    if (av === null) av = -1;
+    if (bv === null) bv = -1;
+    if (typeof av === 'string') return sortDir * av.localeCompare(bv);
+    return sortDir * (av - bv);
+  });
+
+  // Stats
+  const filledRows = filtered.filter(r => [r.ee,r.vodafone,r.o2,r.three].some(v=>v!==null));
+  const highOpp = filtered.filter(r => getOpportunity(r.ee,[r.vodafone,r.o2,r.three]).label === 'High').length;
+  document.getElementById('tableStats').innerHTML =
+    `<span>Showing <strong>${filtered.length}</strong> postcodes</span>
+     <span>With data: <strong>${filledRows.length}</strong></span>
+     <span>High opportunity: <strong style="color:var(--green)">${highOpp}</strong></span>`;
+
+  // Render
+  const tbody = document.getElementById('tableBody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><h3>No postcodes match your filters</h3><p>Try adjusting the filters above</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => {
+    const vals = { EE: r.ee, Vodafone: r.vodafone, O2: r.o2, Three: r.three };
+    const definedVals = Object.entries(vals).filter(([,v]) => v !== null);
+    let winner = null, loser = null;
+    let winners = [], losers = [];
+    if (definedVals.length > 1) {
+      const maxVal = Math.max(...definedVals.map(([,v]) => v));
+      const minVal = Math.min(...definedVals.map(([,v]) => v));
+      winners = definedVals.filter(([,v]) => v === maxVal).map(([k]) => k);
+      losers = definedVals.filter(([,v]) => v === minVal).map(([k]) => k);
+      if (winners.length === 1) winner = winners[0];
+      if (losers.length === 1 && maxVal !== minVal) loser = losers[0];
+    }
+
+    const opp = getOpportunity(r.ee, [r.vodafone, r.o2, r.three]);
+
+    const cellClass = (name) => {
+      if (name === winner) return 'cell-winner';
+      if (name === loser) return 'cell-loser';
+      return '';
+    };
+
+    const providerCell = (name, val, color) => {
+      const cls = cellClass(name);
+      const barColor = cls === 'cell-winner' ? 'var(--green)' : cls === 'cell-loser' ? 'var(--red)' : color;
+      if (val === null) return `<td class="coverage-cell ${cls}"><span style="color:var(--muted)">—</span></td>`;
+      return `<td class="coverage-cell ${cls}">
+        <div class="coverage-bar-wrap">
+          <div class="coverage-bar"><div class="coverage-bar-fill" style="width:${val}%;background:${barColor}"></div></div>
+          <span class="coverage-val">${val}%</span>
+        </div></td>`;
+    };
+
+    const oppBadge = opp.tier
+      ? `<span class="opp-badge opp-${opp.tier}">${opp.label.toUpperCase()}</span>`
+      : '<span style="color:var(--muted);font-size:11px">—</span>';
+
+    const COLOR_MAP = { EE: 'var(--ee)', Vodafone: 'var(--voda)', O2: '#5b8ecf', Three: 'var(--three)' };
+    const winnerBadge = winners.length > 0
+      ? winners.map(w => `<span style="color:${COLOR_MAP[w]};font-family:Syne,sans-serif;font-weight:700;font-size:11px">${w}</span>`).join('<span style="color:var(--muted);font-size:10px"> / </span>')
+      : '<span style="color:var(--muted);font-size:11px">—</span>';
+
+    return `<tr>
+      <td class="postcode-cell">${r.postcode}</td>
+      <td class="region-cell">${r.region}</td>
+      ${providerCell('EE', r.ee, 'var(--ee)')}
+      ${providerCell('Vodafone', r.vodafone, 'var(--voda)')}
+      ${providerCell('O2', r.o2, '#5b8ecf')}
+      ${providerCell('Three', r.three, 'var(--three)')}
+      <td>${oppBadge}</td>
+      <td>${winnerBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function getWinner(r) {
+  const vals = { EE: r.ee, Vodafone: r.vodafone, O2: r.o2, Three: r.three };
+  const def = Object.entries(vals).filter(([,v]) => v !== null);
+  if (!def.length) return null;
+  const max = Math.max(...def.map(([,v]) => v));
+  const w = def.filter(([,v]) => v === max);
+  return w.length === 1 ? w[0][0] : null;
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = -1; }
+  document.querySelectorAll('thead th').forEach(th => th.className = '');
+  const th = document.getElementById('th-' + col);
+  if (th) th.className = sortDir === 1 ? 'sort-asc' : 'sort-desc';
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('filterPostcode').value = '';
+  document.getElementById('filterRegion').value = '';
+  document.getElementById('filterMinEE').value = '';
+  document.getElementById('filterMaxEE').value = '';
+  document.getElementById('filterOpp').value = '';
+  document.getElementById('filterWinner').value = '';
+  document.getElementById('filterLoser').value = '';
+  renderTable();
+}
+
+// ══ TOAST ═════════════════════════════════════════════════════════════════
+let toastTimer;
+function showToast() { showToastMsg('✓ Data saved locally'); }
+function showToastMsg(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══ EXPORT / IMPORT ═══════════════════════════════════════════════════════
+function exportData() {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'postcode-data.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData() {
+  document.getElementById('importFile').click();
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (typeof imported !== 'object' || Array.isArray(imported)) {
+        alert('Invalid file — expected a postcode-data.json file.');
+        return;
+      }
+      const existing = Object.keys(data).length;
+      if (existing > 0 && !confirm(`This will merge imported data with your ${existing} existing entries. Continue?`)) return;
+      // Merge: imported values overwrite existing ones
+      Object.assign(data, imported);
+      saveData();
+      buildRegionList();
+      if (currentRegion) renderPostcodeGrid();
+      showToastMsg('✓ Data imported successfully');
+    } catch(err) {
+      alert('Could not read file. Make sure it\'s a valid postcode-data.json.');
+    }
+    // Reset so the same file can be re-imported if needed
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ══ INIT ══════════════════════════════════════════════════════════════════
+loadData();
+buildRegionList();
+populateRegionFilter();
+renderTable();
+</script>
+</body>
+</html>
