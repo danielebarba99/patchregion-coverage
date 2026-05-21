@@ -404,6 +404,7 @@
     font-family: 'Syne', sans-serif;
     font-weight: 700;
   }
+  .opp-very-high { background: rgba(255,23,68,0.15); color: #ff4d6d; border: 1px solid rgba(255,23,68,0.4); }
   .opp-high { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
   .opp-mid  { background: rgba(0,181,222,0.10); color: var(--ee); border: 1px solid rgba(0,181,222,0.2); }
   .opp-low  { background: rgba(107,114,128,0.15); color: var(--muted); border: 1px solid var(--border); }
@@ -738,6 +739,7 @@
       <span class="filter-label">Opportunity</span>
       <select class="filter-input" id="filterOpp" onchange="renderTable()" style="width:130px">
         <option value="">All</option>
+        <option value="Very High">Very High</option>
         <option value="High">High</option>
         <option value="Medium">Medium</option>
         <option value="Low">Low</option>
@@ -770,8 +772,9 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network (row)</div>
     <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network (row)</div>
-    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> Opp: EE leads by 10%+</div>
-    <div class="legend-item"><div class="opp-badge opp-mid">MED</div> Opp: EE leads by 5–9%</div>
+    <div class="legend-item"><div class="opp-badge opp-very-high">VERY HIGH</div> EE leads by 13%+ over weakest, or 10%+ over every provider</div>
+    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> Opp: EE leads by 10–12%</div>
+    <div class="legend-item"><div class="opp-badge opp-mid">MEDIUM</div> Opp: EE leads by 5–9%</div>
     <div class="legend-item"><div class="opp-badge opp-low">LOW</div> Opp: EE leads by &lt;5%</div>
   </div>
 
@@ -1100,9 +1103,14 @@ function populateRegionFilter() {
 
 function getOpportunity(ee, comps) {
   if (ee === undefined || ee === null) return { label: '—', tier: '' };
-  const maxComp = Math.max(...comps.filter(v => v !== undefined && v !== null));
+  const defined = comps.filter(v => v !== undefined && v !== null);
+  if (!defined.length) return { label: '—', tier: '' };
+  const maxComp = Math.max(...defined);
   if (isNaN(maxComp) || maxComp === -Infinity) return { label: '—', tier: '' };
   const lead = ee - maxComp;
+  // Very High: EE leads the weakest by 13%+ OR EE beats every single provider by 10%+
+  const beatsAllByTen = defined.every(v => ee - v >= 10);
+  if (lead >= 13 || beatsAllByTen) return { label: 'Very High', tier: 'very-high' };
   if (lead >= 10) return { label: 'High', tier: 'high' };
   if (lead >= 5) return { label: 'Medium', tier: 'mid' };
   if (lead > 0) return { label: 'Low', tier: 'low' };
@@ -1167,7 +1175,7 @@ function renderTable() {
   filtered.sort((a, b) => {
     let av = a[sortCol], bv = b[sortCol];
     if (sortCol === 'opportunity') {
-      const tierMap = { 'High': 3, 'Medium': 2, 'Low': 1, '—': 0 };
+      const tierMap = { 'Very High': 4, 'High': 3, 'Medium': 2, 'Low': 1, '—': 0 };
       av = tierMap[getOpportunity(a.ee, [a.vodafone, a.o2, a.three]).label] || 0;
       bv = tierMap[getOpportunity(b.ee, [b.vodafone, b.o2, b.three]).label] || 0;
     }
@@ -1183,7 +1191,7 @@ function renderTable() {
 
   // Stats
   const filledRows = filtered.filter(r => [r.ee,r.vodafone,r.o2,r.three].some(v=>v!==null));
-  const highOpp = filtered.filter(r => getOpportunity(r.ee,[r.vodafone,r.o2,r.three]).label === 'High').length;
+  const highOpp = filtered.filter(r => ['Very High','High'].includes(getOpportunity(r.ee,[r.vodafone,r.o2,r.three]).label)).length;
   document.getElementById('tableStats').innerHTML =
     `<span>Showing <strong>${filtered.length}</strong> postcodes</span>
      <span>With data: <strong>${filledRows.length}</strong></span>
