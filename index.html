@@ -404,7 +404,6 @@
     font-family: 'Syne', sans-serif;
     font-weight: 700;
   }
-  .opp-veryhigh { background: rgba(255,23,68,0.12); color: #ff1744; border: 1px solid rgba(255,23,68,0.4); }
   .opp-high { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
   .opp-mid  { background: rgba(0,181,222,0.10); color: var(--ee); border: 1px solid rgba(0,181,222,0.2); }
   .opp-low  { background: rgba(107,114,128,0.15); color: var(--muted); border: 1px solid var(--border); }
@@ -445,6 +444,187 @@
     color: var(--text);
   }
   .empty-state p { font-size: 12px; }
+
+  /* ── ADMIN PANEL ── */
+  .admin-lock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 200px);
+    gap: 16px;
+  }
+  .admin-lock-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-width: 320px;
+  }
+  .admin-lock-icon {
+    font-size: 32px;
+    line-height: 1;
+  }
+  .admin-lock-box h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .admin-lock-box p {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .admin-pw-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    padding: 10px 16px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.2em;
+    width: 160px;
+    transition: border-color 0.15s;
+  }
+  .admin-pw-input:focus { border-color: var(--ee); }
+  .admin-pw-error {
+    font-size: 11px;
+    color: var(--red);
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    min-height: 16px;
+  }
+  .admin-content { display: none; }
+  .admin-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .admin-header-bar h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .admin-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .admin-card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .admin-card-body { padding: 20px; }
+  .admin-field { margin-bottom: 14px; }
+  .admin-field label {
+    display: block;
+    font-size: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .admin-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  .admin-input:focus { border-color: var(--ee); }
+  select.admin-input { cursor: pointer; }
+  .admin-coverage-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .admin-pc-list {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .admin-pc-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+    gap: 8px;
+  }
+  .admin-pc-item:last-child { border-bottom: none; }
+  .admin-pc-code {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--ee);
+    min-width: 50px;
+  }
+  .admin-pc-region { color: var(--muted); font-size: 11px; flex: 1; }
+  .admin-pc-vals { color: var(--text); font-size: 11px; font-family: 'DM Mono', monospace; }
+  .admin-pc-del {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+  .admin-pc-del:hover { color: var(--red); }
+  .admin-empty {
+    text-align: center;
+    padding: 32px 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .btn-danger {
+    background: rgba(255,23,68,0.12);
+    color: var(--red);
+    border: 1px solid rgba(255,23,68,0.3);
+  }
+  .btn-danger:hover { background: rgba(255,23,68,0.22); }
+  .btn-export {
+    background: rgba(0,230,118,0.1);
+    color: var(--green);
+    border: 1px solid rgba(0,230,118,0.3);
+  }
+  .btn-export:hover { background: rgba(0,230,118,0.18); }
+  .new-region-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    align-items: flex-end;
+  }
+  .new-region-row .admin-input { flex: 1; margin: 0; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -490,6 +670,7 @@
 <div class="tab-nav">
   
   <button class="tab-btn active" onclick="switchTab('analysis')" id="tabAnalysis">◈ Analysis</button>
+  <button class="tab-btn" onclick="switchTab('admin')" id="tabAdmin">⚙ Admin</button>
 </div>
 
 <div class="panel" id="panelSetup" style="display:none">
@@ -557,7 +738,6 @@
       <span class="filter-label">Opportunity</span>
       <select class="filter-input" id="filterOpp" onchange="renderTable()" style="width:130px">
         <option value="">All</option>
-        <option value="Very High">Very High</option>
         <option value="High">High</option>
         <option value="Medium">Medium</option>
         <option value="Low">Low</option>
@@ -590,8 +770,7 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network (row)</div>
     <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network (row)</div>
-    <div class="legend-item"><div class="opp-badge opp-veryhigh">VERY HIGH</div> Opp: EE leads by 13%+</div>
-    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> Opp: EE leads by 10–12%</div>
+    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> Opp: EE leads by 10%+</div>
     <div class="legend-item"><div class="opp-badge opp-mid">MED</div> Opp: EE leads by 5–9%</div>
     <div class="legend-item"><div class="opp-badge opp-low">LOW</div> Opp: EE leads by &lt;5%</div>
   </div>
@@ -619,6 +798,104 @@
 </div>
 
 <div id="toast">✓ Data saved locally</div>
+
+<!-- ADMIN PANEL -->
+<div class="panel" id="panelAdmin">
+
+  <!-- Lock screen -->
+  <div class="admin-lock" id="adminLock">
+    <div class="admin-lock-box">
+      <div class="admin-lock-icon">🔒</div>
+      <h2>Admin Access</h2>
+      <p>Enter the admin password to manage postcodes</p>
+      <input type="password" class="admin-pw-input" id="adminPwInput" placeholder="••••"
+        onkeydown="if(event.key==='Enter') checkAdminPw()">
+      <button class="btn btn-primary" onclick="checkAdminPw()">Unlock</button>
+      <div class="admin-pw-error" id="adminPwError"></div>
+    </div>
+  </div>
+
+  <!-- Admin content (hidden until unlocked) -->
+  <div class="admin-content" id="adminContent">
+    <div class="admin-header-bar">
+      <h2>⚙ Postcode Manager</h2>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-export btn-sm" onclick="downloadUpdatedHTML()">⬇ Download Updated HTML</button>
+        <button class="btn btn-ghost btn-sm" onclick="lockAdmin()">🔒 Lock</button>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+
+      <!-- Add postcode form -->
+      <div class="admin-card">
+        <div class="admin-card-header">➕ Add New Postcode</div>
+        <div class="admin-card-body">
+          <div class="admin-field">
+            <label>Postcode</label>
+            <input type="text" class="admin-input" id="newPcCode" placeholder="e.g. CF99" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+          </div>
+          <div class="admin-field">
+            <label>Region</label>
+            <select class="admin-input" id="newPcRegion">
+            </select>
+          </div>
+          <div style="margin-bottom:6px">
+            <label style="display:block;font-size:10px;font-family:Syne,sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Coverage %</label>
+            <div class="admin-coverage-grid">
+              <div class="admin-field" style="margin:0">
+                <label style="color:var(--ee)">EE</label>
+                <input type="number" class="admin-input" id="newPcEE" min="0" max="100" placeholder="0–100">
+              </div>
+              <div class="admin-field" style="margin:0">
+                <label style="color:var(--voda)">Vodafone</label>
+                <input type="number" class="admin-input" id="newPcVoda" min="0" max="100" placeholder="0–100">
+              </div>
+              <div class="admin-field" style="margin:0">
+                <label style="color:#5b8ecf">O2</label>
+                <input type="number" class="admin-input" id="newPcO2" min="0" max="100" placeholder="0–100">
+              </div>
+              <div class="admin-field" style="margin:0">
+                <label style="color:var(--three)">Three</label>
+                <input type="number" class="admin-input" id="newPcThree" min="0" max="100" placeholder="0–100">
+              </div>
+            </div>
+          </div>
+          <div id="addPcError" style="font-size:11px;color:var(--red);min-height:16px;margin-bottom:8px;font-family:Syne,sans-serif;font-weight:600"></div>
+          <button class="btn btn-primary" style="width:100%" onclick="addNewPostcode()">Add Postcode</button>
+
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+            <label style="display:block;font-size:10px;font-family:Syne,sans-serif;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Add New Region</label>
+            <div class="new-region-row">
+              <input type="text" class="admin-input" id="newRegionName" placeholder="Region name">
+              <button class="btn btn-ghost btn-sm" onclick="addNewRegion()">Add</button>
+            </div>
+            <div id="addRegionError" style="font-size:11px;color:var(--red);min-height:16px;margin-top:6px;font-family:Syne,sans-serif;font-weight:600"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Added postcodes list -->
+      <div class="admin-card">
+        <div class="admin-card-header" style="display:flex;justify-content:space-between;align-items:center">
+          <span>📋 Added Postcodes</span>
+          <span id="addedPcCount" style="font-size:11px;color:var(--muted);font-weight:400">0 added</span>
+        </div>
+        <div class="admin-card-body" style="padding:12px 16px">
+          <div class="admin-pc-list" id="addedPcList">
+            <div class="admin-empty">No postcodes added yet.<br>Use the form to add your first one.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:16px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);line-height:1.6">
+      <strong style="color:var(--text);font-family:Syne,sans-serif">How to publish changes to Netlify:</strong>
+      Click <strong style="color:var(--green)">Download Updated HTML</strong> above — this generates a new <code style="background:var(--surface2);padding:1px 5px;border-radius:3px">index.html</code> with all added postcodes baked into the code. Upload that file to Netlify to replace the existing one.
+    </div>
+  </div>
+</div>
 
 <script>
 // ══ DATA ══════════════════════════════════════════════════════════════════
@@ -789,14 +1066,23 @@ function updateEntryProgress() {
 function switchTab(tab) {
   document.getElementById('panelSetup').classList.toggle('active', tab === 'setup');
   document.getElementById('panelAnalysis').classList.toggle('active', tab === 'analysis');
-  document.getElementById('tabSetup').classList.toggle('active', tab === 'setup');
+  document.getElementById('panelAdmin').classList.toggle('active', tab === 'admin');
+  document.getElementById('tabSetup') && document.getElementById('tabSetup').classList.toggle('active', tab === 'setup');
   document.getElementById('tabAnalysis').classList.toggle('active', tab === 'analysis');
-  document.getElementById('phaseBadge').className = 'phase-badge ' + (tab === 'setup' ? 'phase-setup' : 'phase-analysis');
-  document.getElementById('phaseBadge').textContent = tab === 'setup' ? 'Setup Phase' : 'Analysis Phase';
+  document.getElementById('tabAdmin').classList.toggle('active', tab === 'admin');
+
+  const isSetup = tab === 'setup';
+  const badge = document.getElementById('phaseBadge');
+  badge.className = 'phase-badge ' + (isSetup ? 'phase-setup' : 'phase-analysis');
+  badge.textContent = isSetup ? 'Setup Phase' : tab === 'admin' ? 'Admin' : 'Analysis Phase';
 
   if (tab === 'analysis') {
     populateRegionFilter();
     renderTable();
+  }
+  if (tab === 'admin' && adminUnlocked) {
+    populateAdminRegionSelect();
+    renderAddedPcList();
   }
 }
 
@@ -817,7 +1103,6 @@ function getOpportunity(ee, comps) {
   const maxComp = Math.max(...comps.filter(v => v !== undefined && v !== null));
   if (isNaN(maxComp) || maxComp === -Infinity) return { label: '—', tier: '' };
   const lead = ee - maxComp;
-  if (lead >= 13) return { label: 'Very High', tier: 'veryhigh' };
   if (lead >= 10) return { label: 'High', tier: 'high' };
   if (lead >= 5) return { label: 'Medium', tier: 'mid' };
   if (lead > 0) return { label: 'Low', tier: 'low' };
@@ -882,7 +1167,7 @@ function renderTable() {
   filtered.sort((a, b) => {
     let av = a[sortCol], bv = b[sortCol];
     if (sortCol === 'opportunity') {
-      const tierMap = { 'Very High': 4, 'High': 3, 'Medium': 2, 'Low': 1, '—': 0 };
+      const tierMap = { 'High': 3, 'Medium': 2, 'Low': 1, '—': 0 };
       av = tierMap[getOpportunity(a.ee, [a.vodafone, a.o2, a.three]).label] || 0;
       bv = tierMap[getOpportunity(b.ee, [b.vodafone, b.o2, b.three]).label] || 0;
     }
@@ -898,7 +1183,7 @@ function renderTable() {
 
   // Stats
   const filledRows = filtered.filter(r => [r.ee,r.vodafone,r.o2,r.three].some(v=>v!==null));
-  const highOpp = filtered.filter(r => ['High','Very High'].includes(getOpportunity(r.ee,[r.vodafone,r.o2,r.three]).label)).length;
+  const highOpp = filtered.filter(r => getOpportunity(r.ee,[r.vodafone,r.o2,r.three]).label === 'High').length;
   document.getElementById('tableStats').innerHTML =
     `<span>Showing <strong>${filtered.length}</strong> postcodes</span>
      <span>With data: <strong>${filledRows.length}</strong></span>
@@ -1049,7 +1334,195 @@ function handleImportFile(e) {
   reader.readAsText(file);
 }
 
+// ══ ADMIN ══════════════════════════════════════════════════════════════════
+const ADMIN_PW = 'BB9';
+const ADMIN_STORAGE_KEY = 'severnside_admin_additions_v1';
+let adminUnlocked = false;
+let adminAdditions = {}; // { postcode: { region, ee, vodafone, o2, three } }
+
+function loadAdminAdditions() {
+  try {
+    const raw = localStorage.getItem(ADMIN_STORAGE_KEY);
+    adminAdditions = raw ? JSON.parse(raw) : {};
+  } catch(e) {
+    adminAdditions = {};
+  }
+}
+
+function saveAdminAdditions() {
+  localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminAdditions));
+  // Merge into live data and REGIONS
+  applyAdminAdditions();
+  populateRegionFilter();
+  renderTable();
+}
+
+function applyAdminAdditions() {
+  Object.entries(adminAdditions).forEach(([pc, entry]) => {
+    const { region, ee, vodafone, o2, three } = entry;
+    if (!REGIONS[region]) REGIONS[region] = [];
+    if (!REGIONS[region].includes(pc)) REGIONS[region].push(pc);
+    data[pc] = { ee, vodafone, o2, three };
+  });
+}
+
+function checkAdminPw() {
+  const val = document.getElementById('adminPwInput').value;
+  if (val === ADMIN_PW) {
+    adminUnlocked = true;
+    document.getElementById('adminLock').style.display = 'none';
+    document.getElementById('adminContent').style.display = 'block';
+    populateAdminRegionSelect();
+    renderAddedPcList();
+    document.getElementById('adminPwError').textContent = '';
+    document.getElementById('adminPwInput').value = '';
+  } else {
+    document.getElementById('adminPwError').textContent = 'Incorrect password.';
+    document.getElementById('adminPwInput').value = '';
+    document.getElementById('adminPwInput').focus();
+  }
+}
+
+function lockAdmin() {
+  adminUnlocked = false;
+  document.getElementById('adminLock').style.display = 'flex';
+  document.getElementById('adminContent').style.display = 'none';
+  document.getElementById('adminPwInput').value = '';
+  document.getElementById('adminPwError').textContent = '';
+}
+
+function populateAdminRegionSelect() {
+  const sel = document.getElementById('newPcRegion');
+  sel.innerHTML = '';
+  Object.keys(REGIONS).sort().forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r; opt.textContent = r;
+    sel.appendChild(opt);
+  });
+}
+
+function addNewRegion() {
+  const name = document.getElementById('newRegionName').value.trim();
+  const errEl = document.getElementById('addRegionError');
+  if (!name) { errEl.textContent = 'Please enter a region name.'; return; }
+  if (REGIONS[name]) { errEl.textContent = 'That region already exists.'; return; }
+  REGIONS[name] = [];
+  errEl.textContent = '';
+  document.getElementById('newRegionName').value = '';
+  populateAdminRegionSelect();
+  document.getElementById('newPcRegion').value = name;
+  showToastMsg('✓ Region "' + name + '" added');
+}
+
+function addNewPostcode() {
+  const pc = document.getElementById('newPcCode').value.trim().toUpperCase();
+  const region = document.getElementById('newPcRegion').value;
+  const ee = document.getElementById('newPcEE').value;
+  const voda = document.getElementById('newPcVoda').value;
+  const o2 = document.getElementById('newPcO2').value;
+  const three = document.getElementById('newPcThree').value;
+  const errEl = document.getElementById('addPcError');
+
+  if (!pc) { errEl.textContent = 'Please enter a postcode.'; return; }
+  if (!region) { errEl.textContent = 'Please select a region.'; return; }
+  if (ee === '' || voda === '' || o2 === '' || three === '') {
+    errEl.textContent = 'Please fill in all four coverage values.'; return;
+  }
+  const parse = v => Math.min(100, Math.max(0, parseInt(v, 10)));
+  if ([ee, voda, o2, three].some(v => isNaN(parseInt(v, 10)))) {
+    errEl.textContent = 'Coverage values must be numbers 0–100.'; return;
+  }
+
+  // Check if already in original data
+  if (data[pc] && !adminAdditions[pc]) {
+    errEl.textContent = pc + ' already exists in the original dataset.'; return;
+  }
+
+  errEl.textContent = '';
+  adminAdditions[pc] = { region, ee: parse(ee), vodafone: parse(voda), o2: parse(o2), three: parse(three) };
+  saveAdminAdditions();
+  renderAddedPcList();
+  buildRegionList();
+
+  // Clear form
+  document.getElementById('newPcCode').value = '';
+  document.getElementById('newPcEE').value = '';
+  document.getElementById('newPcVoda').value = '';
+  document.getElementById('newPcO2').value = '';
+  document.getElementById('newPcThree').value = '';
+
+  showToastMsg('✓ ' + pc + ' added to ' + region);
+}
+
+function removeAdminPostcode(pc) {
+  if (!confirm('Remove ' + pc + ' from the added list?')) return;
+  const region = adminAdditions[pc]?.region;
+  delete adminAdditions[pc];
+  // Remove from REGIONS if it was an admin addition
+  if (region && REGIONS[region]) {
+    REGIONS[region] = REGIONS[region].filter(p => p !== pc);
+    if (REGIONS[region].length === 0) {
+      // Check if this region was also admin-added (no original postcodes)
+      // Keep region in list but empty — user can clean up
+    }
+  }
+  delete data[pc];
+  saveAdminAdditions();
+  renderAddedPcList();
+  buildRegionList();
+  populateRegionFilter();
+  renderTable();
+  showToastMsg('✓ ' + pc + ' removed');
+}
+
+function renderAddedPcList() {
+  const el = document.getElementById('addedPcList');
+  const entries = Object.entries(adminAdditions);
+  document.getElementById('addedPcCount').textContent = entries.length + ' added';
+  if (entries.length === 0) {
+    el.innerHTML = '<div class="admin-empty">No postcodes added yet.<br>Use the form to add your first one.</div>';
+    return;
+  }
+  el.innerHTML = entries.map(([pc, d]) =>
+    `<div class="admin-pc-item">
+      <span class="admin-pc-code">${pc}</span>
+      <span class="admin-pc-region">${d.region}</span>
+      <span class="admin-pc-vals">EE:${d.ee} V:${d.vodafone} O2:${d.o2} 3:${d.three}</span>
+      <button class="admin-pc-del" onclick="removeAdminPostcode('${pc}')" title="Remove">✕</button>
+    </div>`
+  ).join('');
+}
+
+function downloadUpdatedHTML() {
+  // Get current page HTML source and inject merged data + regions
+  const mergedData = Object.assign({}, data);
+  const mergedRegions = {};
+  Object.entries(REGIONS).forEach(([r, pcs]) => { mergedRegions[r] = [...pcs]; });
+
+  // Build the new data and regions JSON strings
+  const newDataStr = JSON.stringify(mergedData);
+  const newRegionsStr = JSON.stringify(mergedRegions);
+
+  // Get the current page source and replace the data/regions declarations
+  const html = document.documentElement.outerHTML;
+
+  // Replace the REGIONS constant
+  const updatedHtml = html
+    .replace(/const REGIONS = \{[\s\S]*?\};(?=\s*\n\s*const STORAGE_KEY)/, 'const REGIONS = ' + newRegionsStr + ';')
+    .replace(/data = \{[\s\S]*?\};(?=\s*\n\s*\}[\s\S]*?function saveData)/, 'data = ' + newDataStr + ';');
+
+  const blob = new Blob([updatedHtml], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'index.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToastMsg('✓ Updated index.html downloaded');
+}
+
 // ══ INIT ══════════════════════════════════════════════════════════════════
+loadAdminAdditions();
+applyAdminAdditions();
 loadData();
 buildRegionList();
 populateRegionFilter();
