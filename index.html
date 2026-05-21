@@ -770,10 +770,10 @@
   </div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network (row)</div>
-    <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network (row)</div>
-    <div class="legend-item"><div class="opp-badge opp-very-high">VERY HIGH</div> EE leads by 13%+ over weakest, or 10%+ over every provider</div>
-    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> Opp: EE leads by 10–12%</div>
+    <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network</div>
+    <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network</div>
+    <div class="legend-item"><div class="opp-badge opp-very-high">VERY HIGH</div> EE leads by 13%+ over strongest, or 12%+ over every provider</div>
+    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> EE leads strongest by 10–12%, but not every provider by 12%+</div>
     <div class="legend-item"><div class="opp-badge opp-mid">MEDIUM</div> Opp: EE leads by 5–9%</div>
     <div class="legend-item"><div class="opp-badge opp-low">LOW</div> Opp: EE leads by &lt;5%</div>
   </div>
@@ -1108,8 +1108,8 @@ function getOpportunity(ee, comps) {
   const maxComp = Math.max(...defined);
   if (isNaN(maxComp) || maxComp === -Infinity) return { label: '—', tier: '' };
   const lead = ee - maxComp;
-  // Very High: EE leads the weakest by 13%+ OR EE beats every single provider by 10%+
-  const beatsAllByTen = defined.every(v => ee - v >= 10);
+  // Very High: EE leads the strongest rival by 13%+, OR leads every single provider by 12%+
+  const beatsAllByTen = lead >= 12 && defined.every(v => ee - v >= 12);
   if (lead >= 13 || beatsAllByTen) return { label: 'Very High', tier: 'very-high' };
   if (lead >= 10) return { label: 'High', tier: 'high' };
   if (lead >= 5) return { label: 'Medium', tier: 'mid' };
