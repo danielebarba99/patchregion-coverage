@@ -772,10 +772,10 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network</div>
     <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network</div>
-    <div class="legend-item"><div class="opp-badge opp-very-high">VERY HIGH</div> EE leads by 13%+ over strongest, or 12%+ over every provider</div>
-    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> EE leads strongest rival by 10–12%</div>
-    <div class="legend-item"><div class="opp-badge opp-mid">MEDIUM</div> Opp: EE leads by 5–9%</div>
-    <div class="legend-item"><div class="opp-badge opp-low">LOW</div> Opp: EE leads by &lt;5%</div>
+    <div class="legend-item"><div class="opp-badge opp-very-high">VERY HIGH</div> EE leads weakest rival by 35%+, or leads strongest rival by 33%+</div>
+    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> EE leads weakest rival by 30–34%</div>
+    <div class="legend-item"><div class="opp-badge opp-mid">MEDIUM</div> EE leads weakest rival by 25–29%</div>
+    <div class="legend-item"><div class="opp-badge opp-low">LOW</div> EE leads weakest rival by &lt;25%</div>
   </div>
 
   <div class="table-wrap">
@@ -1106,14 +1106,14 @@ function getOpportunity(ee, comps) {
   const defined = comps.filter(v => v !== undefined && v !== null);
   if (!defined.length) return { label: '—', tier: '' };
   const maxComp = Math.max(...defined);
-  if (isNaN(maxComp) || maxComp === -Infinity) return { label: '—', tier: '' };
-  const lead = ee - maxComp;
-  // Very High: EE leads the strongest rival by 13%+, OR leads every single provider by 12%+
-  const beatsAllByTen = lead >= 12 && defined.every(v => ee - v >= 12);
-  if (lead >= 13 || beatsAllByTen) return { label: 'Very High', tier: 'very-high' };
-  if (lead >= 10) return { label: 'High', tier: 'high' };
-  if (lead >= 5) return { label: 'Medium', tier: 'mid' };
-  if (lead > 0) return { label: 'Low', tier: 'low' };
+  const minComp = Math.min(...defined);
+  const leadMin = ee - minComp;
+  const leadMax = ee - maxComp;
+  // Very High: leads weakest rival by 35%+, OR leads strongest rival by 33%+
+  if (leadMin >= 35 || leadMax >= 33) return { label: 'Very High', tier: 'very-high' };
+  if (leadMin >= 30) return { label: 'High', tier: 'high' };
+  if (leadMin >= 25) return { label: 'Medium', tier: 'mid' };
+  if (leadMin > 0) return { label: 'Low', tier: 'low' };
   return { label: '—', tier: '' };
 }
 
@@ -1194,7 +1194,6 @@ function renderTable() {
   const highOpp = filtered.filter(r => ['Very High','High'].includes(getOpportunity(r.ee,[r.vodafone,r.o2,r.three]).label)).length;
   document.getElementById('tableStats').innerHTML =
     `<span>Showing <strong>${filtered.length}</strong> postcodes</span>
-     <span>With data: <strong>${filledRows.length}</strong></span>
      <span>High opportunity: <strong style="color:var(--green)">${highOpp}</strong></span>`;
 
   // Render
