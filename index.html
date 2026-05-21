@@ -902,6 +902,9 @@
 </div>
 
 <script>
+// Capture clean source at load time — used by downloadUpdatedHTML
+const _pageSource = document.documentElement.outerHTML;
+
 // ══ DATA ══════════════════════════════════════════════════════════════════
 const REGIONS = {
   "Bath": ["BA1","BA10","BA11","BA12","BA13","BA14","BA15","BA16","BA2","BA3","BA4","BA5","BA6","BA7","BA8","BA9"],
@@ -1509,23 +1512,18 @@ function downloadUpdatedHTML() {
   const newDataStr = JSON.stringify(mergedData);
   const newRegionsStr = JSON.stringify(mergedRegions);
 
-  // Fetch the original source file rather than using outerHTML (which mangles the DOM)
-  fetch(window.location.href)
-    .then(r => r.text())
-    .then(html => {
-      const updatedHtml = html
-        .replace(/const REGIONS = \{[\s\S]*?\};(?=\s*\n\s*const STORAGE_KEY)/, 'const REGIONS = ' + newRegionsStr + ';')
-        .replace(/data = \{[\s\S]*?\};(?=\s*\n\s*\}[\s\S]*?function saveData)/, 'data = ' + newDataStr + ';');
+  // Use the source captured at page load — never fetches, never fails
+  const updatedHtml = _pageSource
+    .replace(/const REGIONS = \{[\s\S]*?\};(?=\s*\n\s*const STORAGE_KEY)/, 'const REGIONS = ' + newRegionsStr + ';')
+    .replace(/data = \{[\s\S]*?\};(?=\s*\n\s*\}[\s\S]*?function saveData)/, 'data = ' + newDataStr + ';');
 
-      const blob = new Blob([updatedHtml], { type: 'text/html' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'index.html';
-      a.click();
-      URL.revokeObjectURL(a.href);
-      showToastMsg('✓ Updated index.html downloaded');
-    })
-    .catch(() => showToastMsg('✗ Could not fetch source file'));
+  const blob = new Blob([updatedHtml], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'index.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToastMsg('✓ Updated index.html downloaded');
 }
 
 // ══ INIT ══════════════════════════════════════════════════════════════════
