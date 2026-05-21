@@ -1502,30 +1502,30 @@ function renderAddedPcList() {
 }
 
 function downloadUpdatedHTML() {
-  // Get current page HTML source and inject merged data + regions
   const mergedData = Object.assign({}, data);
   const mergedRegions = {};
   Object.entries(REGIONS).forEach(([r, pcs]) => { mergedRegions[r] = [...pcs]; });
 
-  // Build the new data and regions JSON strings
   const newDataStr = JSON.stringify(mergedData);
   const newRegionsStr = JSON.stringify(mergedRegions);
 
-  // Get the current page source and replace the data/regions declarations
-  const html = document.documentElement.outerHTML;
+  // Fetch the original source file rather than using outerHTML (which mangles the DOM)
+  fetch(window.location.href)
+    .then(r => r.text())
+    .then(html => {
+      const updatedHtml = html
+        .replace(/const REGIONS = \{[\s\S]*?\};(?=\s*\n\s*const STORAGE_KEY)/, 'const REGIONS = ' + newRegionsStr + ';')
+        .replace(/data = \{[\s\S]*?\};(?=\s*\n\s*\}[\s\S]*?function saveData)/, 'data = ' + newDataStr + ';');
 
-  // Replace the REGIONS constant
-  const updatedHtml = html
-    .replace(/const REGIONS = \{[\s\S]*?\};(?=\s*\n\s*const STORAGE_KEY)/, 'const REGIONS = ' + newRegionsStr + ';')
-    .replace(/data = \{[\s\S]*?\};(?=\s*\n\s*\}[\s\S]*?function saveData)/, 'data = ' + newDataStr + ';');
-
-  const blob = new Blob([updatedHtml], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'index.html';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToastMsg('✓ Updated index.html downloaded');
+      const blob = new Blob([updatedHtml], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'index.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToastMsg('✓ Updated index.html downloaded');
+    })
+    .catch(() => showToastMsg('✗ Could not fetch source file'));
 }
 
 // ══ INIT ══════════════════════════════════════════════════════════════════
