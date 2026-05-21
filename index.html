@@ -327,6 +327,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
+    table-layout: fixed;
   }
   thead th {
     padding: 10px 14px;
@@ -772,10 +773,10 @@
   <div class="legend">
     <div class="legend-item"><div class="legend-box" style="background:var(--green-bg);border:1px solid rgba(0,230,118,0.3)"></div> Strongest network</div>
     <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1px solid rgba(255,23,68,0.3)"></div> Weakest network</div>
-    <div class="legend-item"><div class="opp-badge opp-very-high">VERY HIGH</div> EE leads weakest rival by 35%+, or leads strongest rival by 33%+</div>
-    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> EE leads weakest rival by 30–34%</div>
-    <div class="legend-item"><div class="opp-badge opp-mid">MEDIUM</div> EE leads weakest rival by 25–29%</div>
-    <div class="legend-item"><div class="opp-badge opp-low">LOW</div> EE leads weakest rival by &lt;25%</div>
+    <div class="legend-item"><div class="opp-badge opp-very-high">VERY HIGH</div> EE leads weakest rival by 35%+, or leads strongest rival by 34%+</div>
+    <div class="legend-item"><div class="opp-badge opp-high">HIGH</div> EE leads weakest rival by 28–34%</div>
+    <div class="legend-item"><div class="opp-badge opp-mid">MEDIUM</div> EE leads weakest rival by 23–27%</div>
+    <div class="legend-item"><div class="opp-badge opp-low">LOW</div> EE leads weakest rival by &lt;23%</div>
   </div>
 
   <div class="table-wrap">
@@ -784,14 +785,14 @@
       <table>
         <thead>
           <tr>
-            <th onclick="sortBy('postcode')" id="th-postcode">Postcode</th>
-            <th onclick="sortBy('region')" id="th-region">Region</th>
-            <th onclick="sortBy('ee')" id="th-ee" style="color:var(--ee)">EE</th>
-            <th onclick="sortBy('vodafone')" id="th-vodafone" style="color:var(--voda)">Vodafone</th>
-            <th onclick="sortBy('o2')" id="th-o2" style="color:#5b8ecf">O2</th>
-            <th onclick="sortBy('three')" id="th-three" style="color:var(--three)">Three</th>
-            <th onclick="sortBy('opportunity')" id="th-opportunity">Opportunity</th>
-            <th onclick="sortBy('winner')" id="th-winner">Best Network</th>
+            <th onclick="sortBy('postcode')" id="th-postcode" style="width:90px">Postcode</th>
+            <th onclick="sortBy('region')" id="th-region" style="width:140px">Region</th>
+            <th onclick="sortBy('ee')" id="th-ee" style="color:var(--ee);width:160px;min-width:160px">EE</th>
+            <th onclick="sortBy('vodafone')" id="th-vodafone" style="color:var(--voda);width:160px;min-width:160px">Vodafone</th>
+            <th onclick="sortBy('o2')" id="th-o2" style="color:#5b8ecf;width:160px;min-width:160px">O2</th>
+            <th onclick="sortBy('three')" id="th-three" style="color:var(--three);width:160px;min-width:160px">Three</th>
+            <th onclick="sortBy('opportunity')" id="th-opportunity" style="width:110px">Opportunity</th>
+            <th onclick="sortBy('winner')" id="th-winner" style="width:110px">Best Network</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -1109,10 +1110,10 @@ function getOpportunity(ee, comps) {
   const minComp = Math.min(...defined);
   const leadMin = ee - minComp;
   const leadMax = ee - maxComp;
-  // Very High: leads weakest rival by 35%+, OR leads strongest rival by 33%+
-  if (leadMin >= 35 || leadMax >= 33) return { label: 'Very High', tier: 'very-high' };
-  if (leadMin >= 30) return { label: 'High', tier: 'high' };
-  if (leadMin >= 25) return { label: 'Medium', tier: 'mid' };
+  // Very High: leads weakest rival by 35%+, OR leads strongest rival by 34%+
+  if (leadMin >= 35 || leadMax >= 34) return { label: 'Very High', tier: 'very-high' };
+  if (leadMin >= 28) return { label: 'High', tier: 'high' };
+  if (leadMin >= 23) return { label: 'Medium', tier: 'mid' };
   if (leadMin > 0) return { label: 'Low', tier: 'low' };
   return { label: '—', tier: '' };
 }
