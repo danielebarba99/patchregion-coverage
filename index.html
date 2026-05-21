@@ -1214,15 +1214,15 @@ function renderTable() {
       const minVal = Math.min(...definedVals.map(([,v]) => v));
       winners = definedVals.filter(([,v]) => v === maxVal).map(([k]) => k);
       losers = definedVals.filter(([,v]) => v === minVal).map(([k]) => k);
-      if (winners.length === 1) winner = winners[0];
-      if (losers.length === 1 && maxVal !== minVal) loser = losers[0];
+      if (winners.length >= 1) winner = winners;
+      if (losers.length >= 1 && maxVal !== minVal) loser = losers;
     }
 
     const opp = getOpportunity(r.ee, [r.vodafone, r.o2, r.three]);
 
     const cellClass = (name) => {
-      if (name === winner) return 'cell-winner';
-      if (name === loser) return 'cell-loser';
+      if (winner && winner.includes(name)) return 'cell-winner';
+      if (loser && loser.includes(name)) return 'cell-loser';
       return '';
     };
 
